@@ -34,3 +34,50 @@ StormLight/
 ---
 
 ## Декомпозиция
+
+### Блок 1 — Модель карты (`stormlight/map/`)
+
+#### hex.py
+
+- [ ] `hex_neighbor(q, r, d)` — тест: 6 соседей центра, обратный сосед совпадает с исходным
+- [ ] `hex_distance(q1, r1, q2, r2)` — тест: расстояние по известным парам
+- [ ] `hex_ring(cq, cr, radius)` — тест: ring(0,0,1)=6, ring(0,0,2)=12, нет дублей
+- [ ] `hex_disk(cq, cr, radius)` — тест: disk(0,0,0)=1, disk(0,0,2)=19
+
+#### tile.py
+
+- [ ] `rotate_edges(edges, k)` — тест: сдвиг на 6 = исходное, сдвиг на 1 смещает рёбра
+- [ ] `flip_edges(edges)` — тест: двойной флип = исходное
+- [ ] `all_orientations(edges)` — тест: максимум 12, симметричный тайл даёт меньше
+- [ ] `Tile` — поля: `edges`, `numbered`, `number`; свойства `cost` и `tile_type` — тест: 0–1 ущелье→1, 2–3→2, 4–5→3
+
+#### map_config.py
+
+- [ ] `MapConfig` — поля: `map_radius`, `core_positions`, `base_pool_positions`, `n_players` — тест: `core_positions ∩ base_pool_positions == ∅`, все позиции внутри `hex_disk(0, 0, map_radius)`
+- [ ] `DeckConfig` — состав колоды: распределение типов тайлов — тест: веса корректны, диапазоны валидны
+
+#### core.py
+
+- [ ] `CoreConfig` — тип ядра (открытое / закрытое / асимметричное), поворот 0–5
+- [ ] `generate_core(config) -> dict[tuple, Tile]` — тест: ровно 7 тайлов, все соседние пары соблюдают правило стыковки, поворот на 6 = поворот на 0
+
+#### game_map.py
+
+- [ ] `GameMap` — контейнер `dict[tuple, Tile]`, методы: `neighbors(q, r)`, `is_passable(q1, r1, q2, r2)`, `numbered_positions()` — тест: методы возвращают корректные данные на известной сетке
+
+#### map_gen.py
+
+- [ ] `valid_placements(grid, tile) -> list[(pos, edges)]` — все валидные позиции и повороты для тайла — тест: на известной сетке возвращает ожидаемый набор
+- [ ] Стратегии выбора: `random_choice` как дефолт, единая сигнатура для кастомных
+- [ ] `generate_map(map_config, core, deck_config, strategy) -> GameMap` — тест: все позиции заполнены, правило стыковки нигде не нарушено
+
+#### metrics.py
+
+- [ ] `bfs_plateau(game_map, starts) -> dict[tuple, int]` — тест: расстояния на известной карте совпадают с ожидаемыми
+- [ ] `bfs_all_edges(game_map, starts) -> dict[tuple, int]` — тест: результат ≤ plateau на каждой позиции
+- [ ] Связность — все нумерованные тайлы достижимы из всех баз по плато — тест: True / False на известных картах
+- [ ] Bridge shortcut ratio — тест: на сбалансированной карте попадает в диапазон 20–40%
+
+#### visualize.py
+
+- [ ] `draw_map(game_map, path)` — тест: файл создаётся без исключений, гексы и ущелья отрисованы
